@@ -226,10 +226,18 @@ async function updateDashboard() {
 async function loadTeamMembers() {
     try {
         teamMembers = await API.get('/team-members');
+        console.log(`Loaded ${teamMembers.length} team members`);
         renderTeamMembers();
     } catch (error) {
-        showError('Failed to load team members');
-        console.error(error);
+        console.error('Failed to load team members:', error);
+        // Set empty array and render to show placeholder message
+        teamMembers = [];
+        renderTeamMembers();
+        
+        // Only show error alert if there are no members at all and it's not the initial load
+        if (document.querySelector('.tab-btn[data-tab="team-members"]').classList.contains('active')) {
+            showError('Failed to load team members from server');
+        }
     }
 }
 

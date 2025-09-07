@@ -26,9 +26,170 @@ const projectRoot = path.join(__dirname, '../..');
 const TEAM_MEMBERS_FILE = path.join(projectRoot, 'team-members.json');
 const ROADMAP_ITEMS_FILE = path.join(projectRoot, 'roadmap-items.json');
 
-// Default data for when files are not available (especially in serverless environments like Vercel)
-let defaultRoadmapItems = [];
-let defaultTeamMembers = [];
+// Default sample data for when files are not available (especially in serverless environments like Vercel)
+let defaultTeamMembers = [
+  {
+    "id": "sample-1",
+    "name": "Alice Johnson",
+    "level": "Senior",
+    "skills": ["JavaScript", "React", "Node.js", "TypeScript"],
+    "capacity": 1.0,
+    "interests": ["Frontend Engineering", "User Experience"],
+    "careerGoals": ["Technical Leadership", "Mentoring", "Architecture"],
+    "teamName": "Frontend Engineering",
+    "location": "San Francisco",
+    "notes": "Full-stack engineer with strong frontend focus",
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "sample-2", 
+    "name": "Bob Smith",
+    "level": "Staff",
+    "skills": ["Python", "PostgreSQL", "AWS", "Docker"],
+    "capacity": 1.0,
+    "interests": ["Backend Engineering", "System Design"],
+    "careerGoals": ["System Architecture", "Platform Engineering", "Team Leadership"],
+    "teamName": "Backend Engineering",
+    "location": "New York",
+    "notes": "Backend specialist with DevOps experience",
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "sample-3",
+    "name": "Carol Davis",
+    "level": "Mid",
+    "skills": ["Swift", "iOS", "Objective-C", "UIKit"],
+    "capacity": 0.8,
+    "interests": ["Mobile Development", "iOS Engineering"],
+    "careerGoals": ["iOS Expertise", "Cross-platform Development"],
+    "teamName": "Mobile Engineering", 
+    "location": "Austin",
+    "notes": "iOS developer transitioning to cross-platform",
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "sample-4",
+    "name": "David Wilson", 
+    "level": "Junior",
+    "skills": ["Kotlin", "Android", "Java"],
+    "capacity": 1.0,
+    "interests": ["Mobile Development", "Android Engineering"],
+    "careerGoals": ["Technical Growth", "Mobile Expertise", "Code Quality"],
+    "teamName": "Mobile Engineering",
+    "location": "Seattle",
+    "notes": "Junior Android developer eager to learn",
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "sample-5",
+    "name": "Emily Chen",
+    "level": "Principal",
+    "skills": ["System Design", "Kubernetes", "Go", "Microservices"],
+    "capacity": 1.0,
+    "interests": ["Platform Engineering", "Infrastructure"],
+    "careerGoals": ["Engineering Leadership", "Technical Strategy", "Team Scaling"],
+    "teamName": "Platform Engineering",
+    "location": "San Francisco", 
+    "notes": "Principal engineer leading platform initiatives",
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  }
+];
+
+let defaultRoadmapItems = [
+  {
+    "id": "roadmap-sample-1",
+    "name": "User Authentication Revamp",
+    "description": "Modernize authentication system with SSO and multi-factor authentication",
+    "size": 4,
+    "complexity": 4,
+    "requiredSkills": ["Backend", "Security", "Database", "Frontend"],
+    "domain": "Security & Infrastructure",
+    "minLevel": "Mid",
+    "careerOpportunities": ["Security Engineering", "Full-stack Development", "System Design"],
+    "assignedTeam": "Backend Engineering",
+    "effortBreakdown": {
+      "ios": 2,
+      "android": 2,
+      "web": 6,
+      "backend": 12,
+      "total": 22
+    },
+    "platformCount": 4,
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "roadmap-sample-2", 
+    "name": "Mobile App Performance Optimization",
+    "description": "Improve app startup time and reduce memory usage across iOS and Android",
+    "size": 3,
+    "complexity": 3,
+    "requiredSkills": ["iOS", "Android", "Performance Optimization", "Mobile Development"],
+    "domain": "Mobile Experience", 
+    "minLevel": "Mid",
+    "careerOpportunities": ["Mobile Expertise", "Performance Engineering", "Cross-platform Development"],
+    "assignedTeam": "Mobile Engineering",
+    "effortBreakdown": {
+      "ios": 8,
+      "android": 8,
+      "web": 0,
+      "backend": 2,
+      "total": 18
+    },
+    "platformCount": 3,
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "roadmap-sample-3",
+    "name": "Real-time Collaboration Features",
+    "description": "Add real-time editing and collaboration capabilities to the web platform",
+    "size": 5,
+    "complexity": 5,
+    "requiredSkills": ["Frontend", "WebSockets", "Real-time Systems", "Backend", "Database"],
+    "domain": "Product Features",
+    "minLevel": "Senior", 
+    "careerOpportunities": ["Real-time Systems", "Frontend Leadership", "Full-stack Architecture"],
+    "assignedTeam": "Frontend Engineering",
+    "effortBreakdown": {
+      "ios": 0,
+      "android": 0,
+      "web": 16,
+      "backend": 10,
+      "total": 26
+    },
+    "platformCount": 2,
+    "dateAdded": "2025-01-01T00:00:00.000Z", 
+    "importedFrom": "sample-data"
+  },
+  {
+    "id": "roadmap-sample-4",
+    "name": "Infrastructure Migration to Cloud",
+    "description": "Migrate legacy infrastructure to cloud-native architecture",
+    "size": 5,
+    "complexity": 5,
+    "requiredSkills": ["DevOps", "Cloud Architecture", "Kubernetes", "Backend", "Database"],
+    "domain": "Infrastructure",
+    "minLevel": "Senior",
+    "careerOpportunities": ["Cloud Architecture", "DevOps Leadership", "Platform Engineering"],
+    "assignedTeam": "Platform Engineering", 
+    "effortBreakdown": {
+      "ios": 1,
+      "android": 1,
+      "web": 4,
+      "backend": 20,
+      "total": 26
+    },
+    "platformCount": 4,
+    "dateAdded": "2025-01-01T00:00:00.000Z",
+    "importedFrom": "sample-data"
+  }
+];
 
 // Initialize default data from files if available (for local development)
 function initializeDefaultData() {
@@ -110,8 +271,15 @@ function writeDataFile(filename, data) {
 
 // Get all team members
 app.get('/api/team-members', (req, res) => {
-  const teamMembers = readDataFile(TEAM_MEMBERS_FILE);
-  res.json(teamMembers);
+  try {
+    const teamMembers = readDataFile(TEAM_MEMBERS_FILE);
+    console.log(`API: Returning ${teamMembers.length} team members`);
+    res.json(teamMembers);
+  } catch (error) {
+    console.error('Error in /api/team-members:', error);
+    // Return empty array on error to prevent frontend crashes
+    res.json([]);
+  }
 });
 
 // Add a new team member
