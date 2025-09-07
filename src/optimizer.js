@@ -216,7 +216,7 @@ export class AllocationOptimizer {
       if (item.effortBreakdown) {
         // Check each platform requirement
         if (item.effortBreakdown.ios > 0) {
-          const neededFTE = item.effortBreakdown.ios / 12; // Convert weeks to FTE
+          const neededFTE = item.effortBreakdown.ios / 13; // Convert weeks to FTE (13 weeks per quarter)
           const availableCapacity = this.getAvailableCapacityForSkills(platformSkills['iOS Developer']);
           const shortage = Math.max(0, neededFTE - availableCapacity);
           if (shortage > 0) {
@@ -225,7 +225,7 @@ export class AllocationOptimizer {
         }
         
         if (item.effortBreakdown.android > 0) {
-          const neededFTE = item.effortBreakdown.android / 12;
+          const neededFTE = item.effortBreakdown.android / 13; // Convert weeks to FTE (13 weeks per quarter)
           const availableCapacity = this.getAvailableCapacityForSkills(platformSkills['Android Developer']);
           const shortage = Math.max(0, neededFTE - availableCapacity);
           if (shortage > 0) {
@@ -234,7 +234,7 @@ export class AllocationOptimizer {
         }
         
         if (item.effortBreakdown.web > 0) {
-          const neededFTE = item.effortBreakdown.web / 12;
+          const neededFTE = item.effortBreakdown.web / 13; // Convert weeks to FTE (13 weeks per quarter)
           const availableCapacity = this.getAvailableCapacityForSkills(platformSkills['Web Developer']);
           const shortage = Math.max(0, neededFTE - availableCapacity);
           if (shortage > 0) {
@@ -243,7 +243,7 @@ export class AllocationOptimizer {
         }
         
         if (item.effortBreakdown.backend > 0) {
-          const neededFTE = item.effortBreakdown.backend / 12;
+          const neededFTE = item.effortBreakdown.backend / 13; // Convert weeks to FTE (13 weeks per quarter)
           const availableCapacity = this.getAvailableCapacityForSkills(platformSkills['Backend Developer']);
           const shortage = Math.max(0, neededFTE - availableCapacity);
           if (shortage > 0) {

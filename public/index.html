@@ -11,13 +11,13 @@
     <div id="app">
         <header>
             <h1>🏗️ Team Allocation Optimizer</h1>
-            <p>Optimize your team's quarterly roadmap based on size, interest & complexity</p>
+            <p>Optimize your team's next Quarter roadmap based on size, interest & complexity</p>
         </header>
 
         <nav class="tab-nav">
             <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
             <button class="tab-btn" data-tab="team-members">👥 Team Members</button>
-            <button class="tab-btn" data-tab="roadmap-items">📋 Roadmap Items</button>
+            <button class="tab-btn" data-tab="roadmap-items">📋 Next Quarter Roadmap</button>
             <button class="tab-btn" data-tab="optimization">🎯 Optimization</button>
         </nav>
 
@@ -47,7 +47,7 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="runOptimization()">🚀 Run Optimization</button>
+                <button class="btn btn-primary" onclick="runOptimization()">🚀 Run People allocation for the Quarter</button>
             </div>
         </div>
 
@@ -143,7 +143,7 @@
             </div>
             
             <div id="optimization-results">
-                <p class="placeholder">Run optimization to see results here</p>
+                <p class="placeholder">Run people allocation to see quarterly results here</p>
             </div>
         </div>
     </div>
@@ -517,7 +517,7 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
-        <p>Running optimization...</p>
+        <p>Running people allocation for the Quarter...</p>
     </div>
 
     <!-- Optimization Results Overlay -->

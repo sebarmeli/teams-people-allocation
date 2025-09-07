@@ -73,7 +73,7 @@ export class RoadmapItem {
       // Assuming 1 FTE can handle 1 week of work per week
       // Scale based on complexity (complex work needs more senior/focused people)
       const complexityMultiplier = 1 + ((this.complexity - 1) * 0.1); // 1.0 to 1.4x
-      const baseCapacity = this.effortBreakdown.total / 12; // Assume ~12 weeks per quarter
+      const baseCapacity = this.effortBreakdown.total / 13; // Quarter = 13 weeks (3 months)
       return baseCapacity * complexityMultiplier;
     }
     

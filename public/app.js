@@ -6,31 +6,75 @@ let optimizationResults = null;
 // API helpers
 const API = {
     async get(endpoint) {
-        const response = await fetch(`/api${endpoint}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
+        try {
+            const response = await fetch(`/api${endpoint}`);
+            
+            // Check if response is HTML (authentication page)
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                // This is likely a Vercel authentication page
+                throw new Error('Authentication required - please disable deployment protection in Vercel dashboard');
+            }
+            
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        } catch (error) {
+            // Handle network errors or JSON parsing errors
+            if (error.message.includes('Authentication required')) {
+                throw error;
+            }
+            throw new Error(`Failed to connect to server: ${error.message}`);
+        }
     },
 
     async post(endpoint, data) {
-        const response = await fetch(`/api${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || `HTTP error! status: ${response.status}`);
+        try {
+            const response = await fetch(`/api${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            // Check if response is HTML (authentication page)
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                throw new Error('Authentication required - please disable deployment protection in Vercel dashboard');
+            }
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || `HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        } catch (error) {
+            if (error.message.includes('Authentication required')) {
+                throw error;
+            }
+            throw new Error(`Failed to connect to server: ${error.message}`);
         }
-        return response.json();
     },
 
     async delete(endpoint) {
-        const response = await fetch(`/api${endpoint}`, { method: 'DELETE' });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || `HTTP error! status: ${response.status}`);
+        try {
+            const response = await fetch(`/api${endpoint}`, { method: 'DELETE' });
+            
+            // Check if response is HTML (authentication page)
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                throw new Error('Authentication required - please disable deployment protection in Vercel dashboard');
+            }
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || `HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        } catch (error) {
+            if (error.message.includes('Authentication required')) {
+                throw error;
+            }
+            throw new Error(`Failed to connect to server: ${error.message}`);
         }
-        return response.json();
     }
 };
 
@@ -497,7 +541,7 @@ function renderOptimizationResults() {
     const container = document.getElementById('optimization-results');
     
     if (!optimizationResults) {
-        container.innerHTML = '<p class="placeholder">Run optimization to see results here</p>';
+        container.innerHTML = '<p class="placeholder">Run people allocation to see quarterly results here</p>';
         return;
     }
 

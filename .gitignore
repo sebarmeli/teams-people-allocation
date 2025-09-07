@@ -47,3 +47,4 @@ google-service-account.json
 tmp/
 temp/
 node_modules
+.vercel
