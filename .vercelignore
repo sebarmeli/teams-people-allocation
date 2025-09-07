@@ -1,0 +1,8 @@
+.git
+.gitignore
+.claude
+.DS_Store
+*.log
+node_modules/.cache
+tests
+jest.config.js

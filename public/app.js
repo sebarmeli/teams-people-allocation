@@ -335,10 +335,18 @@ async function deleteTeamMember(id) {
 async function loadRoadmapItems() {
     try {
         roadmapItems = await API.get('/roadmap-items');
+        console.log(`Loaded ${roadmapItems.length} roadmap items`);
         renderRoadmapItems();
     } catch (error) {
-        showError('Failed to load roadmap items');
-        console.error(error);
+        console.error('Failed to load roadmap items:', error);
+        // Set empty array and render to show placeholder message
+        roadmapItems = [];
+        renderRoadmapItems();
+        
+        // Only show error alert if there are no items at all and it's not the initial load
+        if (document.querySelector('.tab-btn[data-tab="roadmap-items"]').classList.contains('active')) {
+            showError('Failed to load roadmap items from server');
+        }
     }
 }
 

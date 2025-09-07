@@ -21,27 +21,84 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../public')));
 
-// Data file paths
-const TEAM_MEMBERS_FILE = 'team-members.json';
-const ROADMAP_ITEMS_FILE = 'roadmap-items.json';
+// Data file paths (use absolute paths for better Vercel compatibility)
+const projectRoot = path.join(__dirname, '../..');
+const TEAM_MEMBERS_FILE = path.join(projectRoot, 'team-members.json');
+const ROADMAP_ITEMS_FILE = path.join(projectRoot, 'roadmap-items.json');
+
+// Default data for when files are not available (especially in serverless environments like Vercel)
+let defaultRoadmapItems = [];
+let defaultTeamMembers = [];
+
+// Initialize default data from files if available (for local development)
+function initializeDefaultData() {
+  try {
+    if (fs.existsSync(ROADMAP_ITEMS_FILE)) {
+      const data = fs.readFileSync(ROADMAP_ITEMS_FILE, 'utf8');
+      defaultRoadmapItems = JSON.parse(data);
+      console.log(`Initialized ${defaultRoadmapItems.length} default roadmap items`);
+    }
+  } catch (error) {
+    console.log('Could not load default roadmap items:', error.message);
+  }
+  
+  try {
+    if (fs.existsSync(TEAM_MEMBERS_FILE)) {
+      const data = fs.readFileSync(TEAM_MEMBERS_FILE, 'utf8');
+      defaultTeamMembers = JSON.parse(data);
+      console.log(`Initialized ${defaultTeamMembers.length} default team members`);
+    }
+  } catch (error) {
+    console.log('Could not load default team members:', error.message);
+  }
+}
+
+// Initialize default data on startup
+initializeDefaultData();
 
 // Helper functions
 function readDataFile(filename) {
   try {
+    console.log(`Attempting to read file: ${filename}`);
     if (fs.existsSync(filename)) {
       const data = fs.readFileSync(filename, 'utf8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      console.log(`Successfully read ${parsed.length} items from ${filename}`);
+      return parsed;
+    } else {
+      console.log(`File not found: ${filename}, checking for defaults`);
+      // Return appropriate default data based on filename
+      if (filename.includes('roadmap')) {
+        console.log(`Returning default roadmap items (${defaultRoadmapItems.length} items)`);
+        return defaultRoadmapItems;
+      } else if (filename.includes('team')) {
+        console.log(`Returning default team members (${defaultTeamMembers.length} members)`);
+        return defaultTeamMembers;
+      }
+      return [];
     }
-    return [];
   } catch (error) {
     console.error(`Error reading ${filename}:`, error);
+    // Return appropriate default data on error
+    if (filename.includes('roadmap')) {
+      return defaultRoadmapItems;
+    } else if (filename.includes('team')) {
+      return defaultTeamMembers;
+    }
     return [];
   }
 }
 
 function writeDataFile(filename, data) {
   try {
+    // Ensure directory exists
+    const dir = path.dirname(filename);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
     fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+    console.log(`Successfully wrote ${data.length} items to ${filename}`);
     return true;
   } catch (error) {
     console.error(`Error writing ${filename}:`, error);
@@ -108,8 +165,15 @@ app.delete('/api/team-members/:id', (req, res) => {
 
 // Get all roadmap items
 app.get('/api/roadmap-items', (req, res) => {
-  const roadmapItems = readDataFile(ROADMAP_ITEMS_FILE);
-  res.json(roadmapItems);
+  try {
+    const roadmapItems = readDataFile(ROADMAP_ITEMS_FILE);
+    console.log(`API: Returning ${roadmapItems.length} roadmap items`);
+    res.json(roadmapItems);
+  } catch (error) {
+    console.error('Error in /api/roadmap-items:', error);
+    // Return empty array on error to prevent frontend crashes
+    res.json([]);
+  }
 });
 
 // Add a new roadmap item
@@ -539,6 +603,26 @@ app.get('/api/env', (req, res) => {
     serviceAccountConfigured: !!process.env.SERVICE_ACCOUNT_PATH,
     nodeEnv: process.env.NODE_ENV || 'development'
   });
+});
+
+// Debug endpoint for file paths and existence (for Vercel troubleshooting)
+app.get('/api/debug', (req, res) => {
+  const debug = {
+    cwd: process.cwd(),
+    dirname: __dirname,
+    projectRoot: projectRoot,
+    teamMembersFile: TEAM_MEMBERS_FILE,
+    roadmapItemsFile: ROADMAP_ITEMS_FILE,
+    files: {
+      teamMembersExists: fs.existsSync(TEAM_MEMBERS_FILE),
+      roadmapItemsExists: fs.existsSync(ROADMAP_ITEMS_FILE)
+    },
+    teamMembersCount: readDataFile(TEAM_MEMBERS_FILE).length,
+    roadmapItemsCount: readDataFile(ROADMAP_ITEMS_FILE).length
+  };
+  
+  console.log('Debug info:', debug);
+  res.json(debug);
 });
 
 // Serve the main HTML file

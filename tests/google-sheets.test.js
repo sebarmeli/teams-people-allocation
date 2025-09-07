@@ -28,8 +28,8 @@ describe('GoogleSheetsService', () => {
 
   describe('parseTeamMemberRow', () => {
     it('should parse a complete team member row', () => {
-      const headers = ['name', 'level', 'skills', 'capacity', 'interests', 'career goals'];
-      const row = ['Alice Johnson', 'Senior', 'JavaScript, React', '1.0', 'Frontend', 'Leadership'];
+      const headers = ['first name', 'last name', 'level', 'team name', 'location', 'career goals', 'notes'];
+      const row = ['Alice', 'Johnson', 'Senior', 'Frontend', 'New York', 'Leadership', 'Great developer'];
 
       const member = service.parseTeamMemberRow(headers, row);
 
@@ -37,49 +37,56 @@ describe('GoogleSheetsService', () => {
         id: expect.any(String),
         name: 'Alice Johnson',
         level: 'Senior',
-        skills: ['JavaScript', 'React'],
+        skills: [],
         capacity: 1.0,
         interests: ['Frontend'],
         careerGoals: ['Leadership'],
+        teamName: 'Frontend',
+        location: 'New York',
+        notes: 'Great developer',
         dateAdded: expect.any(String),
         importedFrom: 'google-sheets'
       });
     });
 
     it('should handle missing optional fields', () => {
-      const headers = ['name'];
-      const row = ['Bob Smith'];
+      const headers = ['first name'];
+      const row = ['Bob'];
 
       const member = service.parseTeamMemberRow(headers, row);
 
       expect(member).toEqual({
         id: expect.any(String),
-        name: 'Bob Smith',
+        name: 'Bob',
         level: 'Mid', // Default
         skills: [],
         capacity: 1.0, // Default
         interests: [],
         careerGoals: [],
+        teamName: "",
+        location: "",
+        notes: "",
         dateAdded: expect.any(String),
         importedFrom: 'google-sheets'
       });
     });
 
     it('should handle different header variations', () => {
-      const headers = ['full name', 'experience level', 'technical skills', 'fte'];
-      const row = ['Carol Davis', 'Junior', 'HTML, CSS', '0.8'];
+      const headers = ['first name', 'last name', 'experience level', 'location'];
+      const row = ['Carol', 'Davis', 'Junior', 'San Francisco'];
 
       const member = service.parseTeamMemberRow(headers, row);
 
       expect(member.name).toBe('Carol Davis');
       expect(member.level).toBe('Junior');
-      expect(member.skills).toEqual(['HTML', 'CSS']);
-      expect(member.capacity).toBe(0.8);
+      expect(member.skills).toEqual([]);
+      expect(member.capacity).toBe(1.0);
+      expect(member.location).toBe('San Francisco');
     });
 
     it('should return null for rows without names', () => {
-      const headers = ['name', 'level'];
-      const row = ['', 'Senior']; // Empty name
+      const headers = ['first name', 'last name', 'level'];
+      const row = ['', '', 'Senior']; // Empty names
 
       const member = service.parseTeamMemberRow(headers, row);
 
@@ -87,41 +94,34 @@ describe('GoogleSheetsService', () => {
     });
 
     it('should handle capacity edge cases', () => {
-      const headers = ['name', 'capacity'];
+      const headers = ['first name'];
       
-      // Test invalid capacity values
-      const invalidRow = ['Test User', 'invalid'];
-      const member1 = service.parseTeamMemberRow(headers, invalidRow);
-      expect(member1.capacity).toBe(1.0); // Default
-
-      // Test boundary values
-      const negativeRow = ['Test User', '-0.5'];
-      const member2 = service.parseTeamMemberRow(headers, negativeRow);
-      expect(member2.capacity).toBe(0); // Clamped to 0
-
-      const highRow = ['Test User', '1.5'];
-      const member3 = service.parseTeamMemberRow(headers, highRow);
-      expect(member3.capacity).toBe(1); // Clamped to 1
+      // All rows should have default capacity since the new implementation doesn't parse capacity
+      const testRow = ['Test User'];
+      const member = service.parseTeamMemberRow(headers, testRow);
+      expect(member.capacity).toBe(1.0); // Default capacity
     });
 
     it('should parse comma-separated arrays correctly', () => {
-      const headers = ['name', 'skills', 'interests'];
-      const row = ['Test User', 'JavaScript, React, Node.js', 'Frontend, Full-stack'];
+      const headers = ['first name', 'team name', 'career goals'];
+      const row = ['Test User', 'Full-stack', 'Leadership, Mentoring, Architecture'];
 
       const member = service.parseTeamMemberRow(headers, row);
 
-      expect(member.skills).toEqual(['JavaScript', 'React', 'Node.js']);
-      expect(member.interests).toEqual(['Frontend', 'Full-stack']);
+      expect(member.skills).toEqual([]); // Skills not in new format
+      expect(member.interests).toEqual(['Full-stack']); // Team name becomes interest
+      expect(member.careerGoals).toEqual(['Leadership', 'Mentoring', 'Architecture']);
     });
 
     it('should handle empty and whitespace-only values', () => {
-      const headers = ['name', 'skills', 'interests'];
-      const row = ['Test User', '  , JavaScript,  , React,  ', '   Frontend  ,  ,  Backend  '];
+      const headers = ['first name', 'team name', 'career goals'];
+      const row = ['Test User', '   Frontend  ', '   Leadership  ,  ,  Mentoring  '];
 
       const member = service.parseTeamMemberRow(headers, row);
 
-      expect(member.skills).toEqual(['JavaScript', 'React']); // Empty strings filtered out
-      expect(member.interests).toEqual(['Frontend', 'Backend']); // Trimmed and filtered
+      expect(member.skills).toEqual([]); // Skills not in new format  
+      expect(member.interests).toEqual(['Frontend']); // Trimmed team name
+      expect(member.careerGoals).toEqual(['Leadership', 'Mentoring']); // Empty strings filtered out
     });
   });
 
